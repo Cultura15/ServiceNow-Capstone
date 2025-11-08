@@ -1,0 +1,283 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sp_widget">
+    <sp_widget action="INSERT_OR_UPDATE">
+        <category>custom</category>
+        <client_script><![CDATA[api.controller = function($scope, $window, spUtil) {
+  var c = this;
+
+  c.goBack = function() {
+    $window.history.back();
+  };
+
+  // Optional: mapping for state progression
+  c.stateSteps = ["Pending", "In Progress", "Completed", "Rejected"];
+
+  c.getStateIndex = function(state) {
+    return c.stateSteps.indexOf(state);
+  };
+};
+]]></client_script>
+        <controller_as>c</controller_as>
+        <css>@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&amp;display=swap');&#13;
+&#13;
+.order-details-container {&#13;
+  max-width: 800px;&#13;
+  margin: 40px auto;&#13;
+  background: #fff;&#13;
+  border-radius: 20px;&#13;
+  padding: 32px;&#13;
+  box-shadow: 0 6px 16px rgba(0,0,0,0.08);&#13;
+  font-family: 'Poppins', sans-serif;&#13;
+}&#13;
+&#13;
+.back-btn {&#13;
+  background: none;&#13;
+  border: none;&#13;
+  color: #7c3aed;&#13;
+  font-weight: 600;&#13;
+  margin-bottom: 20px;&#13;
+  cursor: pointer;&#13;
+  transition: color 0.2s;&#13;
+}&#13;
+.back-btn:hover {&#13;
+  color: #6d28d9;&#13;
+}&#13;
+&#13;
+.details-header {&#13;
+  display: flex;&#13;
+  align-items: center;&#13;
+  gap: 20px;&#13;
+  margin-bottom: 24px;&#13;
+}&#13;
+&#13;
+.details-header img {&#13;
+  width: 120px;&#13;
+  height: 120px;&#13;
+  border-radius: 12px;&#13;
+  object-fit: cover;&#13;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);&#13;
+}&#13;
+&#13;
+.details-header h1 {&#13;
+  font-size: 26px;&#13;
+  font-weight: 700;&#13;
+  color: #1e293b;&#13;
+  margin-bottom: 6px;&#13;
+}&#13;
+&#13;
+.order-number, .created-date {&#13;
+  color: #64748b;&#13;
+  font-size: 14px;&#13;
+}&#13;
+&#13;
+.info-grid {&#13;
+  display: grid;&#13;
+  grid-template-columns: repeat(2, 1fr);&#13;
+  gap: 10px 20px;&#13;
+  font-size: 15px;&#13;
+  color: #334155;&#13;
+  margin-bottom: 24px;&#13;
+}&#13;
+&#13;
+.instructions {&#13;
+  background: #f8f9ff;&#13;
+  border-left: 4px solid #8b5cf6;&#13;
+  padding: 16px;&#13;
+  border-radius: 8px;&#13;
+  margin-bottom: 24px;&#13;
+}&#13;
+&#13;
+.instructions h3 {&#13;
+  font-weight: 600;&#13;
+  margin-bottom: 8px;&#13;
+  color: #1e293b;&#13;
+}&#13;
+&#13;
+.state-tracker {&#13;
+  text-align: center;&#13;
+}&#13;
+&#13;
+.steps {&#13;
+  display: flex;&#13;
+  justify-content: space-between;&#13;
+  margin: 20px 0;&#13;
+  position: relative;&#13;
+}&#13;
+&#13;
+.steps::before {&#13;
+  content: '';&#13;
+  position: absolute;&#13;
+  top: 50%;&#13;
+  left: 6%;&#13;
+  right: 6%;&#13;
+  height: 3px;&#13;
+  background: #e2e8f0;&#13;
+  z-index: 0;&#13;
+}&#13;
+&#13;
+.steps div {&#13;
+  position: relative;&#13;
+  z-index: 1;&#13;
+  text-align: center;&#13;
+}&#13;
+&#13;
+.step-circle {&#13;
+  display: inline-block;&#13;
+  width: 32px;&#13;
+  height: 32px;&#13;
+  line-height: 32px;&#13;
+  border-radius: 50%;&#13;
+  background: #e2e8f0;&#13;
+  color: #64748b;&#13;
+  font-weight: 600;&#13;
+  margin-bottom: 8px;&#13;
+}&#13;
+&#13;
+.active .step-circle {&#13;
+  background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);&#13;
+  color: #fff;&#13;
+}&#13;
+&#13;
+.step-label {&#13;
+  display: block;&#13;
+  font-size: 13px;&#13;
+  color: #475569;&#13;
+}&#13;
+&#13;
+.current-state {&#13;
+  font-weight: 600;&#13;
+  margin-top: 10px;&#13;
+}&#13;
+&#13;
+.highlight {&#13;
+  color: #7c3aed;&#13;
+}&#13;
+&#13;
+.error-state {&#13;
+  text-align: center;&#13;
+  padding: 100px 20px;&#13;
+  font-family: 'Poppins', sans-serif;&#13;
+}&#13;
+</css>
+        <data_table>sp_instance</data_table>
+        <demo_data/>
+        <description/>
+        <docs/>
+        <field_list/>
+        <has_preview>false</has_preview>
+        <id/>
+        <internal>false</internal>
+        <link><![CDATA[function link(scope, element, attrs, controller) {
+  
+}]]></link>
+        <name>Order Details Widget</name>
+        <option_schema/>
+        <public>false</public>
+        <roles/>
+        <script><![CDATA[(function() {
+    data.order = {};
+
+    var sysId = $sp.getParameter('sys_id');
+    if (!sysId) {
+        data.error = "Order not found.";
+        return;
+    }
+
+    var gr = new GlideRecord("x_1607167_pet_shop_pet_shop_order");
+    if (gr.get(sysId)) {
+        data.order = {
+            sys_id: gr.getUniqueValue(),
+            number: gr.getDisplayValue("number"),
+            item_name: gr.getDisplayValue("item_name"),
+            category: gr.getDisplayValue("category"),
+            quantity: gr.getValue("quantity"),
+            brand: gr.getDisplayValue("brand"),
+            total_amount: gr.getDisplayValue("total_amount"),
+            order_for: gr.getDisplayValue("order_for"),
+            assigned_to: gr.getDisplayValue("assigned_to"),
+            state: gr.getDisplayValue("state"),
+            special_instructions: gr.getValue("special_instructions"),
+            image: gr.getValue("image"),
+            created_on: gr.getDisplayValue("sys_created_on"),
+            approval: gr.getDisplayValue("approval")
+        };
+    } else {
+        data.error = "Invalid or missing order record.";
+    }
+})();
+]]></script>
+        <servicenow>false</servicenow>
+        <sys_class_name>sp_widget</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2025-11-06 07:02:03</sys_created_on>
+        <sys_id>7f26c169c305f610c7e81d12b40131aa</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>Order Details Widget</sys_name>
+        <sys_package display_value="Pet Shop Needs Management" source="x_1607167_pet_shop">491ba033c3703210c7e81d12b401315e</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="Pet Shop Needs Management">491ba033c3703210c7e81d12b401315e</sys_scope>
+        <sys_update_name>sp_widget_7f26c169c305f610c7e81d12b40131aa</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2025-11-06 07:02:03</sys_updated_on>
+        <template><![CDATA[<div class="order-details-container" ng-if="!c.data.error">
+  <button class="back-btn" ng-click="c.goBack()">← Back</button>
+
+  <div class="details-header">
+    <img ng-src="/sys_attachment.do?sys_id={{c.data.order.image}}" 
+         alt="{{c.data.order.item_name}}"
+         onerror="this.src='https://cdn-icons-png.flaticon.com/512/4076/4076549.png'" />
+    <div>
+      <h1>{{c.data.order.item_name}}</h1>
+      <p class="order-number">Order #{{c.data.order.number}}</p>
+      <p class="created-date">Placed on {{c.data.order.created_on}}</p>
+    </div>
+  </div>
+
+  <div class="details-body">
+    <div class="info-grid">
+      <div><strong>Category:</strong> {{c.data.order.category}}</div>
+      <div><strong>Brand:</strong> {{c.data.order.brand}}</div>
+      <div><strong>Quantity:</strong> {{c.data.order.quantity}}</div>
+      <div><strong>Total Amount:</strong> ₱{{c.data.order.total_amount}}</div>
+      <div><strong>Assigned To:</strong> {{c.data.order.assigned_to || 'Unassigned'}}</div>
+      <div><strong>Approval:</strong> {{c.data.order.approval || 'N/A'}}</div>
+    </div>
+
+    <div class="instructions" ng-if="c.data.order.special_instructions">
+      <h3>Special Instructions</h3>
+      <p>{{c.data.order.special_instructions}}</p>
+    </div>
+
+    <div class="state-tracker">
+      <h3>Order Status</h3>
+      <div class="steps">
+        <div ng-repeat="step in c.stateSteps track by $index"
+             ng-class="{'active': $index <= c.getStateIndex(c.data.order.state)}">
+          <span class="step-circle">{{$index + 1}}</span>
+          <span class="step-label">{{step}}</span>
+        </div>
+      </div>
+      <div class="current-state">
+        Current Status: <span class="highlight">{{c.data.order.state}}</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="error-state" ng-if="c.data.error">
+  <h3>⚠️ {{c.data.error}}</h3>
+  <button class="back-btn" ng-click="c.goBack()">Back</button>
+</div>
+]]></template>
+    </sp_widget>
+    <sys_es_latest_script action="INSERT_OR_UPDATE">
+        <id>7f26c169c305f610c7e81d12b40131aa</id>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2025-11-06 07:02:02</sys_created_on>
+        <sys_id>dc568529c305f610c7e81d12b40131c9</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2025-11-06 07:02:02</sys_updated_on>
+        <table>sp_widget</table>
+        <use_es_latest>true</use_es_latest>
+    </sys_es_latest_script>
+</record_update>
