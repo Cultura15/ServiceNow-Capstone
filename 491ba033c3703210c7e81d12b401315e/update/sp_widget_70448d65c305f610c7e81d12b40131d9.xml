@@ -1,0 +1,317 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sp_widget">
+    <sp_widget action="INSERT_OR_UPDATE">
+        <category>custom</category>
+        <client_script><![CDATA[api.controller = function($scope, $window, spUtil) {
+  var c = this;
+
+  c.goToShop = function() {
+    $window.location.href = '/psmp?id=psmp_shop';
+  };
+
+  c.viewDetails = function(order) {
+    $window.location.href = '/psmp?id=psmp_order_details&sys_id=' + order.sys_id;
+  };
+
+  // Simple color mapping for states
+  c.getStateClass = function(state) {
+    switch (state.toLowerCase()) {
+      case 'pending': return 'state-pending';
+      case 'in progress': return 'state-progress';
+      case 'completed': return 'state-complete';
+      case 'rejected': return 'state-rejected';
+      default: return '';
+    }
+  };
+};
+]]></client_script>
+        <controller_as>c</controller_as>
+        <css>@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&amp;display=swap');&#13;
+&#13;
+.my-orders-container {&#13;
+  max-width: 1200px;&#13;
+  margin: 0 auto;&#13;
+  padding: 32px;&#13;
+  font-family: 'Poppins', sans-serif;&#13;
+  background: linear-gradient(135deg, #f8f9ff 0%, #fff5f7 100%);&#13;
+  min-height: 100vh;&#13;
+}&#13;
+&#13;
+.header-section {&#13;
+  display: flex;&#13;
+  justify-content: space-between;&#13;
+  align-items: center;&#13;
+  margin-bottom: 32px;&#13;
+}&#13;
+&#13;
+.header-section h1 {&#13;
+  font-size: 32px;&#13;
+  font-weight: 700;&#13;
+  color: #1e293b;&#13;
+}&#13;
+&#13;
+.shop-btn {&#13;
+  background: white;&#13;
+  border: 2px solid #e2e8f0;&#13;
+  border-radius: 12px;&#13;
+  padding: 10px 20px;&#13;
+  font-weight: 500;&#13;
+  color: #64748b;&#13;
+  cursor: pointer;&#13;
+  transition: all 0.3s ease;&#13;
+}&#13;
+&#13;
+.shop-btn:hover {&#13;
+  border-color: #8b5cf6;&#13;
+  color: #8b5cf6;&#13;
+  transform: translateY(-2px);&#13;
+}&#13;
+&#13;
+/* Orders Grid */&#13;
+.orders-grid {&#13;
+  display: grid;&#13;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));&#13;
+  gap: 24px;&#13;
+}&#13;
+&#13;
+.order-card {&#13;
+  background: white;&#13;
+  border-radius: 20px;&#13;
+  overflow: hidden;&#13;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);&#13;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;&#13;
+  display: flex;&#13;
+  flex-direction: column;&#13;
+}&#13;
+&#13;
+.order-card:hover {&#13;
+  transform: translateY(-4px);&#13;
+  box-shadow: 0 8px 20px rgba(139, 92, 246, 0.2);&#13;
+}&#13;
+&#13;
+.order-image {&#13;
+  height: 180px;&#13;
+  overflow: hidden;&#13;
+  background: #f8fafc;&#13;
+}&#13;
+&#13;
+.order-image img {&#13;
+  width: 100%;&#13;
+  height: 100%;&#13;
+  object-fit: cover;&#13;
+}&#13;
+&#13;
+.order-info {&#13;
+  padding: 20px;&#13;
+  flex: 1;&#13;
+}&#13;
+&#13;
+.order-info h2 {&#13;
+  font-size: 20px;&#13;
+  font-weight: 600;&#13;
+  color: #1e293b;&#13;
+  margin-bottom: 4px;&#13;
+}&#13;
+&#13;
+.category {&#13;
+  font-size: 14px;&#13;
+  color: #94a3b8;&#13;
+  margin-bottom: 16px;&#13;
+}&#13;
+&#13;
+.details {&#13;
+  font-size: 14px;&#13;
+  color: #475569;&#13;
+  display: flex;&#13;
+  justify-content: space-between;&#13;
+  margin-bottom: 12px;&#13;
+}&#13;
+&#13;
+.order-meta {&#13;
+  display: flex;&#13;
+  justify-content: space-between;&#13;
+  align-items: center;&#13;
+  margin-bottom: 16px;&#13;
+}&#13;
+&#13;
+.state-badge {&#13;
+  padding: 6px 12px;&#13;
+  border-radius: 8px;&#13;
+  font-size: 13px;&#13;
+  font-weight: 600;&#13;
+  text-transform: capitalize;&#13;
+}&#13;
+&#13;
+.state-pending {&#13;
+  background: #fef3c7;&#13;
+  color: #92400e;&#13;
+}&#13;
+&#13;
+.state-progress {&#13;
+  background: #e0f2fe;&#13;
+  color: #0369a1;&#13;
+}&#13;
+&#13;
+.state-complete {&#13;
+  background: #dcfce7;&#13;
+  color: #166534;&#13;
+}&#13;
+&#13;
+.state-rejected {&#13;
+  background: #fee2e2;&#13;
+  color: #991b1b;&#13;
+}&#13;
+&#13;
+.date {&#13;
+  font-size: 13px;&#13;
+  color: #94a3b8;&#13;
+}&#13;
+&#13;
+.details-btn {&#13;
+  width: 100%;&#13;
+  padding: 12px;&#13;
+  border: none;&#13;
+  border-radius: 10px;&#13;
+  background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);&#13;
+  color: white;&#13;
+  font-weight: 600;&#13;
+  cursor: pointer;&#13;
+  transition: all 0.3s ease;&#13;
+}&#13;
+&#13;
+.details-btn:hover {&#13;
+  background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);&#13;
+  transform: translateY(-2px);&#13;
+}&#13;
+&#13;
+/* Empty state */&#13;
+.empty-state {&#13;
+  text-align: center;&#13;
+  padding: 80px 20px;&#13;
+}&#13;
+&#13;
+.empty-state img {&#13;
+  width: 120px;&#13;
+  opacity: 0.7;&#13;
+}&#13;
+&#13;
+.empty-state h3 {&#13;
+  font-size: 22px;&#13;
+  font-weight: 600;&#13;
+  color: #1e293b;&#13;
+  margin-top: 16px;&#13;
+}&#13;
+&#13;
+.empty-state p {&#13;
+  color: #64748b;&#13;
+  margin-bottom: 20px;&#13;
+}&#13;
+</css>
+        <data_table>sp_instance</data_table>
+        <demo_data/>
+        <description/>
+        <docs/>
+        <field_list/>
+        <has_preview>false</has_preview>
+        <id/>
+        <internal>false</internal>
+        <link><![CDATA[function link(scope, element, attrs, controller) {
+  
+}]]></link>
+        <name>My Orders Widget</name>
+        <option_schema/>
+        <public>false</public>
+        <roles>x_1607167_pet_shop.Pet Shop User</roles>
+        <script><![CDATA[(function() {
+    data.orders = [];
+
+    var userId = gs.getUserID();
+    var gr = new GlideRecord("x_1607167_pet_shop_pet_shop_order");
+    if (gr.isValid()) {
+        gr.addQuery("order_for", userId);
+        gr.orderByDesc("sys_created_on");
+        gr.query();
+
+        while (gr.next()) {
+            data.orders.push({
+                sys_id: gr.getUniqueValue(),
+                number: gr.getDisplayValue("number"),
+                item_name: gr.getDisplayValue("item_name"),
+                category: gr.getDisplayValue("category"),
+                quantity: gr.getValue("quantity"),
+                brand: gr.getDisplayValue("brand"),
+                state: gr.getDisplayValue("state"),
+                total_amount: gr.getDisplayValue("total_amount"),
+                special_instructions: gr.getValue("special_instructions"),
+                image: gr.getValue("image"),
+                created_on: gr.getDisplayValue("sys_created_on")
+            });
+        }
+    }
+})();
+]]></script>
+        <servicenow>false</servicenow>
+        <sys_class_name>sp_widget</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2025-11-06 06:54:14</sys_created_on>
+        <sys_id>70448d65c305f610c7e81d12b40131d9</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>My Orders Widget</sys_name>
+        <sys_package display_value="Pet Shop Needs Management" source="x_1607167_pet_shop">491ba033c3703210c7e81d12b401315e</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="Pet Shop Needs Management">491ba033c3703210c7e81d12b401315e</sys_scope>
+        <sys_update_name>sp_widget_70448d65c305f610c7e81d12b40131d9</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2025-11-06 06:54:14</sys_updated_on>
+        <template><![CDATA[<div class="my-orders-container">
+  <div class="header-section">
+    <h1>My Orders</h1>
+    <button class="shop-btn" ng-click="c.goToShop()">Back to Shop</button>
+  </div>
+
+  <div class="orders-grid" ng-if="c.data.orders.length > 0">
+    <div class="order-card" ng-repeat="order in c.data.orders">
+      <div class="order-image">
+        <img ng-src="/sys_attachment.do?sys_id={{order.image}}" alt="{{order.item_name}}" 
+             onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22200%22 height=%22200%22%3E%3Crect fill=%22%23f1f5f9%22 width=%22200%22 height=%22200%22/%3E%3Ctext fill=%22%239ca3af%22 x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22 dy=%22.3em%22 font-size=%2220%22%3ENo Image%3C/text%3E%3C/svg%3E'" />
+      </div>
+
+      <div class="order-info">
+        <h2>{{order.item_name}}</h2>
+        <p class="category">{{order.category}}</p>
+
+        <div class="details">
+          <span><strong>Qty:</strong> {{order.quantity}}</span>
+          <span><strong>Brand:</strong> {{order.brand}}</span>
+        </div>
+
+        <div class="order-meta">
+          <span class="state-badge {{c.getStateClass(order.state)}}">{{order.state}}</span>
+          <span class="date">{{order.created_on}}</span>
+        </div>
+
+        <button class="details-btn" ng-click="c.viewDetails(order)">View Details</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="empty-state" ng-if="!c.data.orders.length">
+    <img src="https://cdn-icons-png.flaticon.com/512/4076/4076549.png" alt="No orders">
+    <h3>No orders yet</h3>
+    <p>You haven’t placed any orders yet. Browse our pet shop to get started!</p>
+    <button class="shop-btn" ng-click="c.goToShop()">Go to Shop</button>
+  </div>
+</div>
+]]></template>
+    </sp_widget>
+    <sys_es_latest_script action="INSERT_OR_UPDATE">
+        <id>70448d65c305f610c7e81d12b40131d9</id>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2025-11-06 06:54:13</sys_created_on>
+        <sys_id>318481a5c305f610c7e81d12b40131bb</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2025-11-06 06:54:13</sys_updated_on>
+        <table>sp_widget</table>
+        <use_es_latest>true</use_es_latest>
+    </sys_es_latest_script>
+</record_update>

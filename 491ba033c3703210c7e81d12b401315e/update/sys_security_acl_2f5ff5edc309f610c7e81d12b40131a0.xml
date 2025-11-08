@@ -2,38 +2,54 @@
     <sys_security_acl action="INSERT_OR_UPDATE">
         <active>true</active>
         <admin_overrides>true</admin_overrides>
-        <advanced>false</advanced>
+        <advanced>true</advanced>
         <applies_to/>
         <condition/>
         <decision_type>allow</decision_type>
-        <description>Allow write for approval in x_1607167_pet_shop_pet_shop_order, for users with role x_1607167_pet_shop.Pet Shop Manager.</description>
+        <description/>
         <local_or_existing>Local</local_or_existing>
-        <name>x_1607167_pet_shop_pet_shop_order.approval</name>
+        <name>x_1607167_pet_shop_pet_shop_order.item_name</name>
         <operation display_value="write">write</operation>
-        <script/>
+        <script><![CDATA[// ACL Script (Advanced)
+(function() {
+    var user = gs.getUser();
+    // Managers can always write
+    if (user.hasRole('x_1607167_pet_shop.Pet Shop Manager')) {
+        return true;
+    }
+
+    // Clerks can write only if order_details_editable is true
+    if (user.hasRole('x_1607167_pet_shop.Pet Shop Clerk') && current.order_details_editable == true) {
+        return true;
+    }
+
+    // Otherwise, deny write
+    return false;
+})();
+]]></script>
         <security_attribute/>
         <sys_class_name>sys_security_acl</sys_class_name>
         <sys_created_by>admin</sys_created_by>
-        <sys_created_on>2025-11-06 06:03:16</sys_created_on>
-        <sys_id>a5c8fca5c3c1f610c7e81d12b40131a6</sys_id>
-        <sys_mod_count>1</sys_mod_count>
-        <sys_name>x_1607167_pet_shop_pet_shop_order.approval</sys_name>
+        <sys_created_on>2025-11-06 11:13:04</sys_created_on>
+        <sys_id>2f5ff5edc309f610c7e81d12b40131a0</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>x_1607167_pet_shop_pet_shop_order.item_name</sys_name>
         <sys_package display_value="Pet Shop Needs Management" source="x_1607167_pet_shop">491ba033c3703210c7e81d12b401315e</sys_package>
         <sys_policy/>
         <sys_scope display_value="Pet Shop Needs Management">491ba033c3703210c7e81d12b401315e</sys_scope>
-        <sys_update_name>sys_security_acl_a5c8fca5c3c1f610c7e81d12b40131a6</sys_update_name>
+        <sys_update_name>sys_security_acl_2f5ff5edc309f610c7e81d12b40131a0</sys_update_name>
         <sys_updated_by>admin</sys_updated_by>
-        <sys_updated_on>2025-11-08 13:42:44</sys_updated_on>
+        <sys_updated_on>2025-11-06 11:13:04</sys_updated_on>
         <type display_value="record">record</type>
     </sys_security_acl>
     <sys_es_latest_script action="INSERT_OR_UPDATE">
-        <id>a5c8fca5c3c1f610c7e81d12b40131a6</id>
+        <id>2f5ff5edc309f610c7e81d12b40131a0</id>
         <sys_created_by>admin</sys_created_by>
-        <sys_created_on>2025-11-06 06:03:13</sys_created_on>
-        <sys_id>32d870e5c3c1f610c7e81d12b40131ee</sys_id>
+        <sys_created_on>2025-11-06 11:13:02</sys_created_on>
+        <sys_id>c1cff5edc309f610c7e81d12b40131aa</sys_id>
         <sys_mod_count>0</sys_mod_count>
         <sys_updated_by>admin</sys_updated_by>
-        <sys_updated_on>2025-11-06 06:03:13</sys_updated_on>
+        <sys_updated_on>2025-11-06 11:13:02</sys_updated_on>
         <table>sys_security_acl</table>
         <use_es_latest>true</use_es_latest>
     </sys_es_latest_script>
